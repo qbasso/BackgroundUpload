@@ -40,11 +40,14 @@ public class Main extends Activity {
 		mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		mAlarmManager.cancel(mAlarmPendingIntent);
 		mPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-			getActionBar().hide();
-		}
+//		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+//			getActionBar().hide();
+//		}
 		if (!mPref.contains("app_key") && !mPref.contains("app_secret")) {
 			initDropboxSession();
+		} else {
+			scheduleAlarms();
+			moveTaskToBack(false);
 		}
 	}
 
@@ -60,23 +63,30 @@ public class Main extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if (mDBApi.getSession().authenticationSuccessful()) {
-			try {
-				mDBApi.getSession().finishAuthentication();
-				AccessTokenPair tokens = mDBApi.getSession()
-						.getAccessTokenPair();
-				storeKeys(tokens.key, tokens.secret);
-				if (Utils.DEBUG_FLAG) {
-					mAlarmManager.set(AlarmManager.RTC_WAKEUP,
-							System.currentTimeMillis(), mAlarmPendingIntent);
-				} else {
-					mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-							System.currentTimeMillis(), Utils.SCAN_INTERVAL,
-							mAlarmPendingIntent);
+		if (mDBApi!=null) {
+			if (mDBApi.getSession().authenticationSuccessful()) {
+				try {
+					mDBApi.getSession().finishAuthentication();
+					AccessTokenPair tokens = mDBApi.getSession()
+							.getAccessTokenPair();
+					storeKeys(tokens.key, tokens.secret);
+					scheduleAlarms();
+					moveTaskToBack(false);
+				} catch (IllegalStateException e) {
+					Log.i("DbAuthLog", "Error authenticating", e);
 				}
-			} catch (IllegalStateException e) {
-				Log.i("DbAuthLog", "Error authenticating", e);
-			}
+			} 
+		}
+	}
+
+	private void scheduleAlarms() {
+		if (Utils.DEBUG_FLAG) {
+			mAlarmManager.set(AlarmManager.RTC_WAKEUP,
+					System.currentTimeMillis(), mAlarmPendingIntent);
+		} else {
+			mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+					System.currentTimeMillis(), Utils.SCAN_INTERVAL,
+					mAlarmPendingIntent);
 		}
 	}
 

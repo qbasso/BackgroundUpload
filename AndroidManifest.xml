@@ -9,6 +9,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" >
     </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -42,9 +44,10 @@
         <receiver
             android:name="UploadRequestReceiver"
             android:enabled="true" >
-            <intent-filter android:priority="1000">
-                <action android:name="pl.qbasso.action_scan_for_upload"/>
-                <action android:name="pl.qbasso.action_retry_upload"/>
+            <intent-filter android:priority="1000" >
+                <action android:name="pl.qbasso.action_scan_for_upload" />
+                 <action android:name="pl.qbasso.action_retry_upload" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
     </application>
