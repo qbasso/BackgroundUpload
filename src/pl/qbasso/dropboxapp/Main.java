@@ -6,7 +6,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -40,9 +39,6 @@ public class Main extends Activity {
 		mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		mAlarmManager.cancel(mAlarmPendingIntent);
 		mPref = PreferenceManager.getDefaultSharedPreferences(this);
-//		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-//			getActionBar().hide();
-//		}
 		if (!mPref.contains("app_key") && !mPref.contains("app_secret")) {
 			initDropboxSession();
 		} else {

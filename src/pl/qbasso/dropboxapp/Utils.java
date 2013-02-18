@@ -4,7 +4,6 @@
 package pl.qbasso.dropboxapp;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,7 +28,7 @@ import android.widget.Toast;
 public class Utils {
 
 	public static final Pattern WAV = Pattern.compile("(?i)[\\s\\S]+\\.wav");
-	public static final String DIR_PATH = "/mnt/sdcard/recorder/";
+	public static final String DIR_PATH = "/mnt/sdcard/voix/";
 	public static final int SCAN_INTERVAL = 1000 * 60 * 10;
 	public static boolean DEBUG_FLAG = true;
 	public static final int RETRY_DELAY = 1000 * 60;
