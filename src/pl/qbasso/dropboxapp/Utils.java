@@ -207,6 +207,15 @@ public class Utils {
 			}
 		}
 	}
+	
+	public static void deleteFile(String fileName) {
+		if (fileName != null) {
+				File f = new File(fileName	);
+				if (f.exists()) {
+					f.delete();
+				}
+		}
+	}
 
 	public static boolean validateEmail(String email) {
 		if (email.matches("(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {

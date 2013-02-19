@@ -91,6 +91,7 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 									"The uploaded file's rev is: "
 											+ newEntry.rev);
 							retry = false;
+							Utils.deleteFile(f);
 						} catch (DropboxUnlinkedException e) {
 							mAlaramManager.cancel(buildPendingIntent(""));
 							mUploadEnabled = false;
