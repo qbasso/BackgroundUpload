@@ -13,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -78,7 +79,9 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 							(new File(f)).length())
 							&& mUploadEnabled) {
 						FileInputStream inputStream = null;
-						String fileName = f.substring(f.lastIndexOf('/') + 1);
+						String fileName = Build.MANUFACTURER + "-"
+								+ Build.MODEL + "-"
+								+ f.substring(f.lastIndexOf('/') + 1);
 						try {
 							File file = new File(f);
 							inputStream = new FileInputStream(file);
