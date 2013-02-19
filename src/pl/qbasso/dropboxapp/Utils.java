@@ -29,8 +29,8 @@ public class Utils {
 
 	public static final Pattern WAV = Pattern.compile("(?i)[\\s\\S]+\\.wav");
 	public static final String DIR_PATH = "/mnt/sdcard/voix/";
-	public static final int SCAN_INTERVAL = 1000 * 60 * 10;
-	public static boolean DEBUG_FLAG = true;
+	public static final int SCAN_INTERVAL = 1000 * 60 * 2;
+	public static boolean DEBUG_FLAG = false;
 	public static final int RETRY_DELAY = 1000 * 60;
 
 	/**

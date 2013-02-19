@@ -35,12 +35,12 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 	public static final String EXTRA_FILENAME = "extra_filename";
 	public static final String ACTION_SCAN_FOR_UPLOAD = "pl.qbasso.action_scan_for_upload";
 	public static final String ACTION_RETRY_UPLOAD = "pl.qbasso.action_retry_upload";
-	private AlarmManager mAlaramManager;
+	private AlarmManager mAlarmManager;
 
 	@Override
 	public void onReceive(Context arg0, Intent arg1) {
 		mContext = arg0;
-		mAlaramManager = (AlarmManager) mContext
+		mAlarmManager = (AlarmManager) mContext
 				.getSystemService(Activity.ALARM_SERVICE);
 		AppKeyPair appKeys = new AppKeyPair(Main.APP_KEY, Main.APP_SECRET);
 		AndroidAuthSession session = new AndroidAuthSession(appKeys,
@@ -52,7 +52,7 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 			if (ACTION_SCAN_FOR_UPLOAD.equals(arg1.getAction())) {
 				if (Environment.getExternalStorageState().equals(
 						Environment.MEDIA_MOUNTED)) {
-					mAlaramManager.cancel(buildPendingIntent(""));
+					mAlarmManager.cancel(buildPendingIntent(""));
 					List<String> files = Utils.exploreToMaxDepth(new File(
 							Utils.DIR_PATH));
 					for (String f : files) {
@@ -73,15 +73,14 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 			@Override
 			public void run() {
 				boolean retry = true;
+				String fileName = Build.MANUFACTURER + "-"
+						+ Build.MODEL + "-"
+						+ f.substring(f.lastIndexOf('/') + 1);
 				if (Utils.checkInternetConnection(mContext)) {
-					if (!checkIfFileExistsInDropbox(
-							f.substring(f.lastIndexOf('/')),
+					if (!checkIfFileExistsInDropbox(fileName,
 							(new File(f)).length())
 							&& mUploadEnabled) {
 						FileInputStream inputStream = null;
-						String fileName = Build.MANUFACTURER + "-"
-								+ Build.MODEL + "-"
-								+ f.substring(f.lastIndexOf('/') + 1);
 						try {
 							File file = new File(f);
 							inputStream = new FileInputStream(file);
@@ -91,10 +90,11 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 									"The uploaded file's rev is: "
 											+ newEntry.rev);
 							retry = false;
+							inputStream.close();
 							Utils.deleteFile(f);
 						} catch (DropboxUnlinkedException e) {
-							mAlaramManager.cancel(buildPendingIntent(""));
-							mUploadEnabled = false;
+							mAlarmManager.cancel(buildPendingIntent(""));
+//							mUploadEnabled = false;
 							clearSharedPrefs();
 							Intent i = prepareIntent();
 							mContext.startActivity(i);
@@ -104,6 +104,8 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 									"Something went wrong while uploading.");
 						} catch (FileNotFoundException e) {
 							Log.e("DbExampleLog", "File not found.");
+						} catch (IOException e) {
+							e.printStackTrace();
 						} finally {
 							if (inputStream != null) {
 								try {
@@ -118,7 +120,7 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 					}
 				}
 				if (retry) {
-					mAlaramManager.set(AlarmManager.RTC_WAKEUP,
+					mAlarmManager.set(AlarmManager.RTC_WAKEUP,
 							System.currentTimeMillis() + Utils.RETRY_DELAY,
 							buildPendingIntent(f));
 				}
@@ -156,7 +158,7 @@ public class UploadRequestReceiver extends BroadcastReceiver {
 	private boolean checkIfFileExistsInDropbox(String fileName, long fSize) {
 		boolean result = false;
 		try {
-			Entry existingEntry = mDBApi.metadata(fileName, 1, null, false,
+			Entry existingEntry = mDBApi.metadata("/"+fileName, 1, null, false,
 					null);
 			if (existingEntry != null && existingEntry.bytes == fSize) {
 				result = true;
